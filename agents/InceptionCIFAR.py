@@ -1,40 +1,49 @@
 import numpy as np
 
 from tqdm import tqdm
+import itertools
 
 import torch
 from torch import nn
+
+from torchvision.models import inception_v3
+from torchvision.datasets import CIFAR10
 from torch.utils.data import DataLoader
+from torch.optim import SGD
+from torchvision import transforms
+import torch.nn.functional as F
 
 from agents.base import BaseAgent
-from datasets.augmentable import AugmentableDataset
-# from models.ga_models.example import ExampleModel
 
 from tensorboardX import SummaryWriter
 
 
-class ExampleAgentGA(BaseAgent):
+class InceptionCIFAR(BaseAgent):
 
     def __init__(self, config):
         super().__init__(config)
 
         # define models
-        self.model = None
+        self.model = inception_v3(progress=False)
 
         # define data_loader
-        self.train_dataset = AugmentableDataset() # update this
-        self.train_steps = len(self.train_dataset) // config.batch_size
-        self.data_loader_ga = None
-        self.data_loader_dl = DataLoader(self.train_dataset, batch_size=config.batch_size, shuffle=True, num_workers=config.num_workers)
-
-        # define genetic model
-        self.genetic_model = None
+        self.batch_size = config.batch_size
+        transform = transforms.Compose([
+            transforms.Resize(255),
+            transforms.CenterCrop(299), 
+            transforms.ToTensor(),
+        ])
+        cifar_data = CIFAR10('.', train=True, download=True, transform=transform)
+        cifar_test_data = CIFAR10('.', train=False, download=True, transform=transform)
+        # not yet support GPU
+        self.data_loader = DataLoader(cifar_data, batch_size=config.batch_size, shuffle=True)
+        self.test_loader = DataLoader(cifar_test_data, batch_size=config.batch_size)
 
         # define loss
-        self.loss = None
+        self.loss = nn.CrossEntropyLoss()
 
         # define optimizers for both generator and discriminator
-        self.optimizer = None
+        self.optimizer = SGD(self.model.parameters(), lr=config.learning_rate)
 
         # initialize counter
         self.current_epoch = 0
@@ -55,16 +64,14 @@ class ExampleAgentGA(BaseAgent):
             torch.cuda.set_device(self.config.gpu_device)
             self.model = self.model.cuda()
             self.loss = self.loss.cuda()
-            self.device = torch.device("cuda")
             print("Program will run on *****GPU-CUDA***** ")
         else:
-            self.device = torch.device("cpu")
             print("Program will run on *****CPU*****\n")
 
         # Model Loading from the latest checkpoint if not found start from scratch.
         self.load_checkpoint(self.config.checkpoint_file)
         # Summary Writer
-        self.summary_writer = None
+        self.summary_writer = SummaryWriter()
 
     def load_checkpoint(self, file_name):
         """
@@ -99,48 +106,52 @@ class ExampleAgentGA(BaseAgent):
         Main training loop
         :return:
         """
-        self.train_one_epoch()
-        self.genetic_model.initialize_population()
         for epoch in range(self.config.current_epoch, self.config.max_epoch):
             self.current_epoch = epoch
-            self.ga_selection_one_epoch()
-            self.train_one_epoch()
-
-    def ga_selection_one_epoch(self):
-        """
-        One epoch of genetic algorithm selection
-        :return:
-        """
-        pass
+            print(f"Epoch: {self.current_epoch + 1}")
+            epoch_loss = self.train_one_epoch()
+            test_loss = self.validate()
+            self.summary_writer.add_scalar("training loss", epoch_loss / len(self.data_loader), self.current_epoch)
+            self.summary_writer.add_scalar("test loss", test_loss / len(self.test_loader), self.current_epoch)
 
     def train_one_epoch(self):
         """
         One epoch of training
         :return:
         """
-        tqdm_batch = tqdm(self.data_loader_dl, total=self.train_steps)
         self.model.train()
         epoch_loss = 0
 
-        for batch_idx, (x, y) in enumerate(tqdm_batch):
-            x, y = x.to(self.device), y.to(self.device)
-            
-            y_pred = self.model(x)
-            cur_loss = self.loss(y_pred, y)
+        for x, y in self.data_loader:
+            # x, y = x.to(self.device), y.to(self.device)
 
+            y_pred, x = self.model(x)
+            cur_loss = self.loss(y_pred, y)
             self.optimizer.zero_grad()
             cur_loss.backward()
             self.optimizer.step()
-
             epoch_loss += cur_loss.item()
             self.current_iteration += 1
+
+        return epoch_loss
 
     def validate(self):
         """
         One cycle of model validation
         :return:
         """
-        pass
+        self.model.eval()
+        test_loss = 0
+        correct = 0
+
+        for data, target in self.test_loader, 1:
+            output = self.model(data)
+            test_loss += F.nll_loss(output, target, size_average=False).item()  # sum up batch loss
+            pred = output.max(1, keepdim=True)[1]  # get the index of the max log-probability
+            correct += pred.eq(target.view_as(pred)).sum().item()
+
+        test_loss /= len(self.test_loader * self.batch_size)
+        return test_loss
 
     def finalize(self):
         """

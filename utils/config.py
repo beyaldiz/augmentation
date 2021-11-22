@@ -20,6 +20,10 @@ def get_config_from_json(json_file):
             config_dict = json.load(config_file)
             # EasyDict allows to access dict values as attributes (works recursively).
             config = EasyDict(config_dict)
+
+            if 'current_epoch' not in config or not config['current_epoch']:
+                config.current_epoch = 0
+            
             return config, config_dict
         except ValueError:
             print("INVALID JSON file format.. Please provide a good json file")
