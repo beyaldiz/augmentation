@@ -22,7 +22,7 @@ from utils.transformations import Transformations
 
 from tensorboardX import SummaryWriter
 
-class MobileNetCIFAR(BaseAgent):
+class MlpCIFAR(BaseAgent):
 
     def __init__(self, config):
         super().__init__(config)
