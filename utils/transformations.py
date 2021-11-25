@@ -1,4 +1,5 @@
 import torch
+import random
 from torchvision import transforms
 import torchvision.transforms.functional as F
 
@@ -29,9 +30,13 @@ class Transformations:
         self.genome_len = len(self.augmentations)
         self.transformations = [_transformations[augmentation] for augmentation in self.augmentations]
     
-    def get_transformation(self, genome):
+    def get_transformation(self, genome, shuffle=False):
         transformation_list = []
         for i in range(len(genome)):
             transformation = self.transformations[i]
             transformation_list.append(transformation(genome[i]))
+        
+        if shuffle:
+            random.shuffle(transformation_list)
+
         return transforms.Compose(transformation_list)

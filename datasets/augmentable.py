@@ -5,7 +5,7 @@ import torchvision.transforms as transforms
 
 
 class AugmentableDataset(Dataset):
-    def __init__(self, images, targets, transformations, pre_transform=None, post_transform=None):
+    def __init__(self, images, targets, transformations, pre_transform=None, post_transform=None, shuffle=None):
         """
         Images and targets are passed as any type.
         Pre transform is applied in the beginning of getitem.
@@ -22,6 +22,7 @@ class AugmentableDataset(Dataset):
         self.transformations = transformations
         self.pre_transform = pre_transform
         self.post_transform = post_transform
+        self.shuffle = shuffle
         self.transforms = [None for _ in range(self.images.shape[0])]
         self._eval_children = False
         self._children = None
@@ -36,7 +37,7 @@ class AugmentableDataset(Dataset):
                 tr_array = []
                 if self.pre_transform != None:
                     tr_array.append(self.pre_transform)
-                transform = self.transformations.get_transformation(genome)
+                transform = self.transformations.get_transformation(genome, self.shuffle)
                 tr_array.append(transform)
                 if self.post_transform != None:
                     tr_array.append(self.post_transform)

@@ -44,7 +44,8 @@ class MlpCIFAR(BaseAgent):
         cifar_data = CIFAR10('./data', train=True, download=True)
         cifar_test_data = CIFAR10('./data', train=False, download=True, transform=pre_transform)
 
-        self.aug_dataset_train = AugmentableDataset(cifar_data.data[::4], cifar_data.targets[::4], self.transformations, pre_transform=pre_transform)
+        # augmentation strategies: Random, W-10, SENSEI
+        self.aug_dataset_train = AugmentableDataset(cifar_data.data[::4], cifar_data.targets[::4], self.transformations, pre_transform=pre_transform, shuffle=config.shuffle)
 
         # not yet support GPU
         self.data_loader = DataLoader(self.aug_dataset_train, batch_size=config.batch_size, shuffle=True)

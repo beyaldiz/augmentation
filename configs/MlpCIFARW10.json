@@ -1,5 +1,5 @@
 {
-  "exp_name": "example_exp_0",
+  "exp_name": "example_w-10",
   "agent": "MlpCIFAR",
   "mode": "train",
 
@@ -20,6 +20,6 @@
 
   "augmentations": ["rotate", "translate_horizontal"],
   "augmentation_ranges": [[-30, 30], [-0.1, 0.1]],
-  "population_size": 4,
+  "population_size": 10,
   "shuffle": true
 }
