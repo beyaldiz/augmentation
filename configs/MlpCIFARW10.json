@@ -21,5 +21,7 @@
   "augmentations": ["rotate", "translate_horizontal"],
   "augmentation_ranges": [[-30, 30], [-0.1, 0.1]],
   "population_size": 10,
+  "crossover_rate": 0.9,
+  "elitism_selection_rate": 0.5,
   "shuffle": true
 }
