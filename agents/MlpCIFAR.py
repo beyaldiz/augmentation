@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 
 from agents.base import BaseAgent
 from datasets.augmentable import AugmentableDataset
-from models.ga_models.ga_model import GAModel
+# from models.ga_models.ga_model import GAModel
+from models.ga_models.ga_base import GABaseModel
 from models.dl_models.mlp import MLP
 from utils.transformations import Transformations
 
@@ -29,7 +30,8 @@ class MlpCIFAR(BaseAgent):
 
         # define models
         self.model = MLP()
-        self.ga_model = GAModel(config)
+        # self.ga_model = GAModel(config)
+        self.ga_model = GABaseModel(config)
 
         # define data_loader
         self.batch_size = config.batch_size
