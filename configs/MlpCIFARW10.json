@@ -14,12 +14,12 @@
   "beta1": 0.5,
   "beta2": 0.999,
 
-  "max_epoch": 20,
+  "max_epoch": 3,
 
   "checkpoint_file": "checkpoint.pth.tar",
 
   "augmentations": ["rotate", "translate_horizontal"],
   "augmentation_ranges": [[-30, 30], [-0.1, 0.1]],
   "population_size": 10,
-  "shuffle": true
+  "shuffle": false
 }
