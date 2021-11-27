@@ -1,7 +1,10 @@
 import numpy as np
+from numpy.core.fromnumeric import prod
 
 from tqdm import tqdm
-import itertools
+from itertools import product
+from numpy import linspace
+from random import shuffle
 
 import torch
 from torch import nn
@@ -211,9 +214,47 @@ class MlpCIFAR(BaseAgent):
 
         return test_loss, correct
 
-    def finalize(self):
+    def finalize(self, num=3):
         """
         Finalizes all the operations of the 2 Main classes of the process, the operator and the data loader
         :return:
         """
-        pass
+
+        # compute robust accuracy
+        genomes = []
+        transform_list = []
+
+        for i in range(len(self.config.augmentations)):
+            genomes.append(list(linspace(self.config.augmentation_ranges[i][0], self.config.augmentation_ranges[i][1], num=num)))
+
+        for genome in product(*genomes):
+            transform = self.transformations.get_transformation(genome)
+
+            if self.config.shuffle:
+                shuffle(transform)
+            
+            transform_list.append(transform)
+        
+        print("\nComputing robust accuracy...")
+        self.model.eval()
+        correct = 0
+        instances = 0
+
+        for x, y in tqdm(self.test_loader):        
+            for i in range(len(x)):
+                is_robust = True
+                instances += 1
+                inpt = x[i]
+                for tr in transform_list:
+                    x_tr = tr(inpt).flatten(start_dim=0)
+                    y_pred = self.model(x_tr)
+                    pred = y_pred.argmax()
+                    if pred != y[i]:
+                        is_robust = False
+                        break
+                if is_robust:
+                    correct += 1
+            
+        print(f"Robust accuracy: {correct / instances}")
+
+            

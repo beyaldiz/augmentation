@@ -23,5 +23,5 @@
   "population_size": 10,
   "crossover_rate": 0.9,
   "elitism_selection_rate": 0.5,
-  "shuffle": true
+  "shuffle": false
 }
