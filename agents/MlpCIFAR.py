@@ -238,9 +238,9 @@ class MlpCIFAR(BaseAgent):
         correct = 0
         instances = 0
 
-        for x, y in tqdm(self.test_loader):
-            is_robust = True
+        for x, y in tqdm(self.test_loader):        
             for i in range(len(x)):
+                is_robust = True
                 instances += 1
                 inpt = x[i]
                 for tr in transform_list:
