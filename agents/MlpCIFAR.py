@@ -12,6 +12,7 @@ from torch import nn
 from torchvision.datasets import CIFAR10
 from torch.utils.data import DataLoader
 from torch.optim import SGD
+from torch.optim import Adam
 from torchvision import transforms
 import torch.nn.functional as F
 
@@ -26,8 +27,8 @@ from utils.transformations import Transformations
 
 from tensorboardX import SummaryWriter
 
-class MlpCIFAR(BaseAgent):
 
+class MlpCIFAR(BaseAgent):
     def __init__(self, config):
         super().__init__(config)
 
@@ -47,22 +48,35 @@ class MlpCIFAR(BaseAgent):
         self.transformations = Transformations(config)
 
         cifar_data = CIFAR10('./data', train=True, download=True)
-        cifar_test_data = CIFAR10('./data', train=False, download=True, transform=pre_transform)
+        cifar_test_data = CIFAR10('./data',
+                                  train=False,
+                                  download=True,
+                                  transform=pre_transform)
 
         # augmentation strategies: Random, W-10, SENSEI
-        self.aug_dataset_train = AugmentableDataset(cifar_data.data[::4], cifar_data.targets[::4], self.transformations, pre_transform=pre_transform, shuffle=config.shuffle)
+        self.aug_dataset_train = AugmentableDataset(
+            cifar_data.data[::4],
+            cifar_data.targets[::4],
+            self.transformations,
+            pre_transform=pre_transform,
+            shuffle=config.shuffle)
 
         # not yet support GPU
-        self.data_loader = DataLoader(self.aug_dataset_train, batch_size=config.batch_size, shuffle=True)
-        self.data_loader_ordered = DataLoader(self.aug_dataset_train, batch_size=config.batch_size, shuffle=False)
-        self.test_loader = DataLoader(cifar_test_data, batch_size=config.batch_size)
+        self.data_loader = DataLoader(self.aug_dataset_train,
+                                      batch_size=config.batch_size,
+                                      shuffle=True)
+        self.data_loader_ordered = DataLoader(self.aug_dataset_train,
+                                              batch_size=config.batch_size,
+                                              shuffle=False)
+        self.test_loader = DataLoader(cifar_test_data,
+                                      batch_size=config.batch_size)
 
         # define loss
         self.loss = nn.CrossEntropyLoss()
         self.loss_single = nn.CrossEntropyLoss(reduction='none')
 
         # define optimizers for both generator and discriminator
-        self.optimizer = SGD(self.model.parameters(), lr=config.learning_rate)
+        self.optimizer = Adam(self.model.parameters(), lr=config.learning_rate)
 
         # initialize counter
         self.current_epoch = 0
@@ -72,7 +86,9 @@ class MlpCIFAR(BaseAgent):
         # set cuda flag
         self.is_cuda = torch.cuda.is_available()
         if self.is_cuda and not self.config.cuda:
-            print("WARNING: You have a CUDA device, so you should probably enable CUDA")
+            print(
+                "WARNING: You have a CUDA device, so you should probably enable CUDA"
+            )
 
         self.cuda = self.is_cuda & self.config.cuda
 
@@ -108,11 +124,21 @@ class MlpCIFAR(BaseAgent):
         :return:
         """
         pass
-    
+
     def write_summary_per_epoch(self, epoch_loss, test_loss, correct):
-        self.summary_writer.add_scalar("training loss", epoch_loss / len(self.data_loader), self.current_epoch)
-        self.summary_writer.add_scalar("test loss", test_loss / len(self.test_loader), self.current_epoch)
-        self.summary_writer.add_scalar("test accuracy", correct / len(self.test_loader.dataset), self.current_epoch)
+        print(f"\ntraining loss: {epoch_loss / len(self.data_loader)}")
+        print(f"test loss: {test_loss / len(self.test_loader)}")
+        print(f"test accuracy: {correct / len(self.test_loader.dataset)}")
+
+        self.summary_writer.add_scalar("training loss",
+                                       epoch_loss / len(self.data_loader),
+                                       self.current_epoch)
+        self.summary_writer.add_scalar("test loss",
+                                       test_loss / len(self.test_loader),
+                                       self.current_epoch)
+        self.summary_writer.add_scalar("test accuracy",
+                                       correct / len(self.test_loader.dataset),
+                                       self.current_epoch)
 
     def run(self):
         """
@@ -140,12 +166,12 @@ class MlpCIFAR(BaseAgent):
                 self.write_summary_per_epoch(epoch_loss, test_loss, correct)
                 self.current_epoch = epoch
                 continue
-            
+
             self.genetic_evolve_one_epoch()
             epoch_loss = self.train_one_epoch()
             test_loss, correct = self.validate()
             self.write_summary_per_epoch(epoch_loss, test_loss, correct)
-    
+
     def genetic_evolve_one_epoch(self):
         """
         One epoch of genetic evolution
@@ -170,7 +196,6 @@ class MlpCIFAR(BaseAgent):
         f_best = f.argmax(axis=1)
         self.aug_dataset_train.pick_best_child(f_best)
         self.ga_model.update_population(f, children)
-        
 
     def train_one_epoch(self):
         """
@@ -225,22 +250,26 @@ class MlpCIFAR(BaseAgent):
         transform_list = []
 
         for i in range(len(self.config.augmentations)):
-            genomes.append(list(linspace(self.config.augmentation_ranges[i][0], self.config.augmentation_ranges[i][1], num=num)))
+            genomes.append(
+                list(
+                    linspace(self.config.augmentation_ranges[i][0],
+                             self.config.augmentation_ranges[i][1],
+                             num=num)))
 
         for genome in product(*genomes):
             transform = self.transformations.get_transformation(genome)
 
             if self.config.shuffle:
                 shuffle(transform)
-            
+
             transform_list.append(transform)
-        
+
         print("\nComputing robust accuracy...")
         self.model.eval()
         correct = 0
         instances = 0
 
-        for x, y in tqdm(self.test_loader):        
+        for x, y in tqdm(self.test_loader):
             for i in range(len(x)):
                 is_robust = True
                 instances += 1
@@ -254,7 +283,5 @@ class MlpCIFAR(BaseAgent):
                         break
                 if is_robust:
                     correct += 1
-            
-        print(f"Robust accuracy: {correct / instances}")
 
-            
+        print(f"Robust accuracy: {correct / instances}")
