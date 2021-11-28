@@ -23,7 +23,7 @@ def get_config_from_json(json_file):
 
             if 'current_epoch' not in config or not config['current_epoch']:
                 config.current_epoch = 0
-            
+
             return config, config_dict
         except ValueError:
             print("INVALID JSON file format.. Please provide a good json file")
@@ -54,8 +54,10 @@ def process_config(json_file):
         exit(-1)
 
     # create some important directories to be used for that experiment.
-    config.summary_dir = os.path.join("experiments", config.exp_name, "summaries/")
-    config.checkpoint_dir = os.path.join("experiments", config.exp_name, "checkpoints/")
+    config.summary_dir = os.path.join("experiments", config.exp_name,
+                                      "summaries/")
+    config.checkpoint_dir = os.path.join("experiments", config.exp_name,
+                                         "checkpoints/")
     create_dirs([config.summary_dir, config.checkpoint_dir])
 
     return config
