@@ -2,7 +2,6 @@ from random import uniform, choice, randint, random
 from functools import reduce
 
 from numpy.lib.function_base import select
-import numpy.random as nrand
 from models.ga_models.ga_base import GABaseModel
 
 """
