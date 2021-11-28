@@ -194,7 +194,7 @@ class MlpCIFAR(BaseAgent):
         for x, y in tqdm(self.data_loader_ordered):
             batch_loss = []
             for i in range(len(x)):
-                inpt = x[i].flatten(start_dim=1)
+                inpt = x[i]
                 y_pred = self.model(inpt)
                 loss = self.loss_single(y_pred, y[i])
                 batch_loss.append(loss.detach().numpy())
@@ -215,7 +215,6 @@ class MlpCIFAR(BaseAgent):
         epoch_loss = 0
 
         for x, y in tqdm(self.data_loader):
-            x = x.flatten(start_dim=1)
             y_pred = self.model(x)
             cur_loss = self.loss(y_pred, y)
             self.optimizer.zero_grad()
@@ -237,7 +236,6 @@ class MlpCIFAR(BaseAgent):
         correct = 0
 
         for x, y in tqdm(self.test_loader):
-            x = x.flatten(start_dim=1)
             y_pred = self.model(x)
             cur_loss = self.loss(y_pred, y)
             pred = y_pred.max(1)[1]
@@ -282,7 +280,7 @@ class MlpCIFAR(BaseAgent):
                 instances += 1
                 inpt = x[i]
                 for tr in transform_list:
-                    x_tr = tr(inpt).flatten(start_dim=0)
+                    x_tr = tr(inpt)
                     y_pred = self.model(x_tr)
                     pred = y_pred.argmax()
                     if pred != y[i]:
