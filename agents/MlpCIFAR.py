@@ -281,6 +281,7 @@ class MlpCIFAR(BaseAgent):
                 inpt = x[i]
                 for tr in transform_list:
                     x_tr = tr(inpt)
+                    x_tr = x_tr[None, :]
                     y_pred = self.model(x_tr)
                     pred = y_pred.argmax()
                     if pred != y[i]:
