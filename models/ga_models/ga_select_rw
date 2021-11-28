@@ -1,0 +1,21 @@
+from random import uniform, choice, randint, random
+from functools import reduce
+
+from numpy.lib.function_base import select
+import numpy.random as nrand
+from ga_base import GABaseModel
+
+"""
+Genetic algorithm with Roulette-Wheel Selection.
+"""
+
+class GA_RWModel(GABaseModel):
+        
+    def update_single_population(self, population, fitness):
+        # Redefine selection with Roulette-Wheel method
+        f_sum = sum(fitness)
+        select_prob = [f_value/f_sum for f_value in fitness]
+        
+        return nrand.choice(population, p=select_prob)
+
+
