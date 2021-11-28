@@ -11,7 +11,6 @@ from tensorboardX import SummaryWriter
 
 
 class ExampleAgent(BaseAgent):
-
     def __init__(self, config):
         super().__init__(config)
 
@@ -35,7 +34,9 @@ class ExampleAgent(BaseAgent):
         # set cuda flag
         self.is_cuda = torch.cuda.is_available()
         if self.is_cuda and not self.config.cuda:
-            print("WARNING: You have a CUDA device, so you should probably enable CUDA")
+            print(
+                "WARNING: You have a CUDA device, so you should probably enable CUDA"
+            )
 
         self.cuda = self.is_cuda & self.config.cuda
 

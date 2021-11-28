@@ -5,7 +5,13 @@ import torchvision.transforms as transforms
 
 
 class AugmentableDataset(Dataset):
-    def __init__(self, images, targets, transformations, pre_transform=None, post_transform=None, shuffle=None):
+    def __init__(self,
+                 images,
+                 targets,
+                 transformations,
+                 pre_transform=None,
+                 post_transform=None,
+                 shuffle=None):
         """
         Images and targets are passed as any type.
         Pre transform is applied in the beginning of getitem.
@@ -26,10 +32,10 @@ class AugmentableDataset(Dataset):
         self.transforms = [None for _ in range(self.images.shape[0])]
         self._eval_children = False
         self._children = None
-    
+
     def __len__(self):
         return self.images.shape[0]
-    
+
     def __getitem__(self, idx):
         if self._eval_children:
             instances = []
@@ -37,13 +43,16 @@ class AugmentableDataset(Dataset):
                 tr_array = []
                 if self.pre_transform != None:
                     tr_array.append(self.pre_transform)
-                transform = self.transformations.get_transformation(genome, self.shuffle)
+                transform = self.transformations.get_transformation(
+                    genome, self.shuffle)
                 tr_array.append(transform)
                 if self.post_transform != None:
                     tr_array.append(self.post_transform)
                 tr = transforms.Compose(tr_array)
                 instances.append(tr(self.images[idx]))
-            return instances, [self.targets[idx] for _ in range(len(instances))]
+            return instances, [
+                self.targets[idx] for _ in range(len(instances))
+            ]
 
         else:
             tr_array = []
@@ -67,20 +76,21 @@ class AugmentableDataset(Dataset):
         f_best (numpy.array, shape: (N, )): indices of the children that have the largest loss 
         """
         for i in range(f_best.shape[0]):
-            self.transforms[i] = self.transformations.get_transformation(self._children[i][f_best[i]])
-    
+            self.transforms[i] = self.transformations.get_transformation(
+                self._children[i][f_best[i]])
+
     def eval_children(self):
         """
         Switching to evaluation of children's mode
         """
         self._eval_children = True
-    
+
     def train_best(self):
         """
         Switching to training with the best children mode
         """
         self._eval_children = False
-    
+
     def update_children(self, children):
         """
         Updates the children array

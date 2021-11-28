@@ -3,14 +3,14 @@ from utils.config import *
 
 from agents import *
 
+
 def main():
     # parse the path of the json config file
     arg_parser = argparse.ArgumentParser(description="")
-    arg_parser.add_argument(
-        'config',
-        metavar='config_json_file',
-        default='None',
-        help='The Configuration file in json format')
+    arg_parser.add_argument('config',
+                            metavar='config_json_file',
+                            default='None',
+                            help='The Configuration file in json format')
     args = arg_parser.parse_args()
 
     # parse the config json file

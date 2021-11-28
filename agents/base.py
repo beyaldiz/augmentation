@@ -8,7 +8,6 @@ class BaseAgent:
     """
     This base class will contain the base functions to be overloaded by any agent you will implement.
     """
-
     def __init__(self, config):
         self.config = config
 
