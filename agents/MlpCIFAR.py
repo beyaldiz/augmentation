@@ -291,3 +291,4 @@ class MlpCIFAR(BaseAgent):
                     correct += 1
 
         print(f"Robust accuracy: {correct / instances}")
+        self.summary_writer.add_scalar("robust accuracy", correct / instances)
