@@ -8,7 +8,7 @@ from random import shuffle
 import torch
 from torch import nn
 
-from torchvision.datasets import CIFAR10
+from torchvision.datasets import *
 from torch.utils.data import DataLoader
 from torch.optim import SGD
 from torch.optim import Adam
@@ -50,20 +50,27 @@ class General(BaseAgent):
         # Transformations defined in config is loaded into Transformations class
         # Later it is used internally in AugmentableDataset to compose transformations using genomes
         self.transformations = Transformations(config)
-
-        cifar_data = CIFAR10('./data', train=True, download=True)
-        cifar_test_data = CIFAR10('./data',
-                                  train=False,
-                                  download=True,
-                                  transform=pre_transform)
+        
+        try:
+            dataset = globals()[config.dataset]
+            data = dataset('./data', train=True, download=True)
+            test_data = dataset('./data', train=False, download=True)
+        except:
+            raise KeyError("The dataset name is invalid, please visit https://pytorch.org/vision/stable/datasets.html")
 
         # augmentation strategies: Random, W-10, SENSEI
         self.aug_dataset_train = AugmentableDataset(
-            cifar_data.data[::4],
-            cifar_data.targets[::4],
+            data.data[::4],
+            data.targets[::4],
             self.transformations,
             pre_transform=pre_transform,
             shuffle=config.shuffle)
+
+        self.aug_dataset_test = AugmentableDataset(
+            test_data.data, 
+            test_data.targets,
+            pre_transform=pre_transform
+        )
 
         # not yet support GPU
         self.data_loader = DataLoader(self.aug_dataset_train,
@@ -72,7 +79,7 @@ class General(BaseAgent):
         self.data_loader_ordered = DataLoader(self.aug_dataset_train,
                                               batch_size=config.batch_size,
                                               shuffle=False)
-        self.test_loader = DataLoader(cifar_test_data,
+        self.test_loader = DataLoader(self.aug_dataset_test,
                                       batch_size=config.batch_size)
 
         # define loss

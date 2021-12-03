@@ -1,6 +1,7 @@
 {
   "exp_name": "example_exp_0",
   "agent": "General",
+  "dataset": "CIFAR10",
   "mode": "train",
 
   "cuda": true,
