@@ -2,8 +2,8 @@
   "exp_name": "example_exp_0",
   "agent": "General",
   "dataset": "CIFAR10",
-  "dl_model": "models.dl_models.mlp.MLP",
-  "ga_model": "models.ga_models.ga_select_rw.GA_RWModel",
+  "dl_model": "MLP",
+  "ga_model": "GA_RWModel",
   "mode": "train",
 
   "cuda": true,
