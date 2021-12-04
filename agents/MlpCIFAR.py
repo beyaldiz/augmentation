@@ -21,12 +21,6 @@ import matplotlib.pyplot as plt
 from agents.base import BaseAgent
 from datasets.augmentable import AugmentableDataset
 
-# from models.ga_models.ga_model import GAModel
-# from models.ga_models.ga_select_rw import GA_RWModel
-# from models.ga_models.ga_tournament import GA_Tournament
-from models.ga_models.ga_base import GABaseModel
-
-from models.dl_models.mlp import MLP
 from utils.transformations import Transformations
 
 from tensorboardX import SummaryWriter
@@ -37,14 +31,11 @@ class MlpCIFAR(BaseAgent):
         super().__init__(config)
 
         # define models
-        self.model = MLP()
+        self.model = self.import_model(config.dl_model)()
+        self.ga_model = self.import_model(config.ga_model)(config)
+
         if config.cuda:
             self.model.to(f"cuda:{config.gpu_device}")
-
-        # self.ga_model = GAModel(config)
-        # self.ga_model = GA_RWModel(config)
-        # self.ga_model = GA_Tournament(config)
-        self.ga_model = GABaseModel(config)
 
         # define data_loader
         self.batch_size = config.batch_size

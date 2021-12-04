@@ -62,3 +62,17 @@ class BaseAgent:
         :return:
         """
         raise NotImplementedError
+    
+    def import_model(self, model_path):
+        """
+        Imports a model from a file
+        :param model_path: path to the model file
+        :return:
+        """
+        last_dot = model_path.rfind('.')
+        module_name, class_name = model_path[:last_dot], model_path[last_dot + 1:]
+        try:
+            module = __import__(module_name, globals(), locals(  ), [class_name])
+        except ImportError:
+            raise ImportError('The model %s could not be loaded, make sure that it is importable' % model_path)
+        return vars(module)[class_name]
