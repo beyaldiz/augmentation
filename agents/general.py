@@ -15,9 +15,6 @@ from torch.optim import Adam
 from torchvision import transforms
 import torch.nn.functional as F
 
-from models.dl_models import *
-from models.ga_models import *
-
 from agents.base import BaseAgent
 from datasets.augmentable import AugmentableDataset
 
@@ -289,5 +286,3 @@ class General(BaseAgent):
         print(f"Robust accuracy: {correct / instances}")
         self.summary_writer.add_scalar("robust accuracy", correct / instances)
 
-    def import_model(self, model):
-        return globals()[model]
