@@ -2,7 +2,7 @@
     "exp_name": "Execution 1",
     "agent": "General",
     "dataset": "CIFAR10",
-    "dl_model": "MLP",
+    "dl_model": "ResNet101",
     "ga_model": "GA_RandomModel",
     "mode": "train",
   
