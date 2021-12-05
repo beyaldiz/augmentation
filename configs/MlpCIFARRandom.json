@@ -1,6 +1,9 @@
 {
   "exp_name": "example_random_augmentation",
   "agent": "MlpCIFAR",
+  "dataset": "CIFAR10",
+  "dl_model": "MLP",
+  "ga_model": "GA_RandomModel",
   "mode": "train",
 
   "cuda": true,

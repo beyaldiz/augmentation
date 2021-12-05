@@ -1,6 +1,9 @@
 {
   "exp_name": "example_w-10",
   "agent": "MlpCIFAR",
+  "dataset": "CIFAR10",
+  "dl_model": "MLP",
+  "ga_model": "GA_RWModel",
   "mode": "train",
 
   "cuda": true,

@@ -1,6 +1,9 @@
 {
   "exp_name": "example_exp_0",
   "agent": "MlpCIFAR",
+  "dataset": "CIFAT10",
+  "dl_model": "MLP",
+"ga_model": "GA_RandomModel",
   "mode": "train",
 
   "cuda": true,

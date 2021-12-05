@@ -11,4 +11,4 @@ class ResNet101(nn.Module):
                                     pretrained=True)
 
     def forward(self, x):
-        return self.model(x)
+        return self.model(x.cuda())
