@@ -212,7 +212,7 @@ class General(BaseAgent):
         epoch_loss = 0
 
         for x, y in tqdm(self.data_loader):
-            y_pred = self.model(x)
+            y_pred = self.model(x.cuda())
             cur_loss = self.loss(y_pred, y.cuda())
             self.optimizer.zero_grad()
             cur_loss.backward()
