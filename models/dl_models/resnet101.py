@@ -8,7 +8,7 @@ class ResNet101(nn.Module):
 
         self.model = torch.hub.load('pytorch/vision:v0.10.0',
                                     'resnet101',
-                                    pretrained=True)
+                                    pretrained=False)
 
     def forward(self, x):
         return self.model(x.cuda())
