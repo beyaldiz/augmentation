@@ -22,6 +22,7 @@ from utils.transformations import Transformations
 
 from tensorboardX import SummaryWriter
 
+
 class General(BaseAgent):
     def __init__(self, config):
         super().__init__(config)
@@ -39,13 +40,15 @@ class General(BaseAgent):
         # Transformations defined in config is loaded into Transformations class
         # Later it is used internally in AugmentableDataset to compose transformations using genomes
         self.transformations = Transformations(config)
-        
+
         try:
             dataset = globals()[config.dataset]
             data = dataset('./data', train=True, download=True)
             test_data = dataset('./data', train=False, download=True)
         except:
-            raise KeyError("The dataset name is invalid, please visit https://pytorch.org/vision/stable/datasets.html")
+            raise KeyError(
+                "The dataset name is invalid, please visit https://pytorch.org/vision/stable/datasets.html"
+            )
 
         # augmentation strategies: Random, W-10, SENSEI
         self.aug_dataset_train = AugmentableDataset(
@@ -55,11 +58,9 @@ class General(BaseAgent):
             pre_transform=pre_transform,
             shuffle=config.shuffle)
 
-        self.aug_dataset_test = AugmentableDataset(
-            test_data.data, 
-            test_data.targets,
-            pre_transform=pre_transform
-        )
+        self.aug_dataset_test = AugmentableDataset(test_data.data,
+                                                   test_data.targets,
+                                                   pre_transform=pre_transform)
 
         # not yet support GPU
         self.data_loader = DataLoader(self.aug_dataset_train,
@@ -163,11 +164,12 @@ class General(BaseAgent):
                 epoch_loss = self.train_one_epoch()
                 test_loss, correct = self.validate()
                 if type(self.ga_model).__name__ != 'GA_NoneModel':
-                    self.ga_model.init_populations(len(self.data_loader.dataset))
+                    self.ga_model.init_populations(
+                        len(self.data_loader.dataset))
                 self.write_summary_per_epoch(epoch_loss, test_loss, correct)
                 self.current_epoch = epoch
                 continue
-            
+
             if type(self.ga_model).__name__ != 'GA_NoneModel':
                 self.genetic_evolve_one_epoch()
             epoch_loss = self.train_one_epoch()
@@ -191,8 +193,8 @@ class General(BaseAgent):
             for i in range(len(x)):
                 inpt = x[i]
                 y_pred = self.model(inpt)
-                loss = self.loss_single(y_pred, y[i])
-                batch_loss.append(loss.detach().numpy())
+                loss = self.loss_single(y_pred, y[i].cuda())
+                batch_loss.append(loss.cpu().detach().numpy())
             f_array.append(np.stack(batch_loss))
         f = np.concatenate(f_array, axis=1).transpose()
         f_best = f.argmax(axis=1)
@@ -211,7 +213,7 @@ class General(BaseAgent):
 
         for x, y in tqdm(self.data_loader):
             y_pred = self.model(x)
-            cur_loss = self.loss(y_pred, y)
+            cur_loss = self.loss(y_pred, y.cuda())
             self.optimizer.zero_grad()
             cur_loss.backward()
             self.optimizer.step()
@@ -232,9 +234,9 @@ class General(BaseAgent):
 
         for x, y in tqdm(self.test_loader):
             y_pred = self.model(x)
-            cur_loss = self.loss(y_pred, y)
+            cur_loss = self.loss(y_pred, y.cuda())
             pred = y_pred.max(1)[1]
-            correct += pred.eq(y).sum().item()
+            correct += pred.cpu().eq(y).sum().item()
             test_loss += cur_loss.item()
 
         return test_loss, correct
@@ -279,7 +281,7 @@ class General(BaseAgent):
                     x_tr = x_tr[None, :]
                     y_pred = self.model(x_tr)
                     pred = y_pred.argmax()
-                    if pred != y[i]:
+                    if pred != y[i].cuda():
                         is_robust = False
                         break
                 if is_robust:
@@ -287,4 +289,3 @@ class General(BaseAgent):
 
         print(f"Robust accuracy: {correct / instances}")
         self.summary_writer.add_scalar("robust accuracy", correct / instances)
-

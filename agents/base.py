@@ -5,6 +5,7 @@ import logging
 from models.dl_models import *
 from models.ga_models import *
 
+
 class BaseAgent:
     """
     This base class will contain the base functions to be overloaded by any agent you will implement.
@@ -63,7 +64,7 @@ class BaseAgent:
         :return:
         """
         raise NotImplementedError
-    
+
     def import_model(self, model):
         """
         Imports a model from a file

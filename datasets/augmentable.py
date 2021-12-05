@@ -58,9 +58,9 @@ class AugmentableDataset(Dataset):
                     if self.pre_transform:
                         tr_array.pop(0)
                         tr = transforms.Compose(tr_array)
-                        instances.append(tr(self.images[idx]))    
+                        instances.append(tr(self.images[idx]))
                     else:
-                        raise e 
+                        raise e
             return instances, [
                 self.targets[idx] for _ in range(len(instances))
             ]
