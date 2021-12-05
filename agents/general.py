@@ -162,12 +162,14 @@ class General(BaseAgent):
             if epoch == 0:
                 epoch_loss = self.train_one_epoch()
                 test_loss, correct = self.validate()
-                self.ga_model.init_populations(len(self.data_loader.dataset))
+                if type(self.ga_model).__name__ != 'GA_NoneModel':
+                    self.ga_model.init_populations(len(self.data_loader.dataset))
                 self.write_summary_per_epoch(epoch_loss, test_loss, correct)
                 self.current_epoch = epoch
                 continue
-
-            self.genetic_evolve_one_epoch()
+            
+            if type(self.ga_model).__name__ != 'GA_NoneModel':
+                self.genetic_evolve_one_epoch()
             epoch_loss = self.train_one_epoch()
             test_loss, correct = self.validate()
             self.write_summary_per_epoch(epoch_loss, test_loss, correct)
