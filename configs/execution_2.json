@@ -1,0 +1,39 @@
+{
+    "exp_name": "Execution 2",
+    "agent": "General",
+    "dataset": "CIFAR10",
+    "dl_model": "ResNet101",
+    "ga_model": "GA_RandomModel",
+    "mode": "train",
+  
+    "cuda": true,
+    "gpu_device": 0,
+    "seed": 1337,
+  
+    "batch_size": 128,
+  
+    "learning_rate": 0.002,
+    "weight_decay": 0,
+    "beta1": 0.5,
+    "beta2": 0.999,
+  
+    "max_epoch": 20,
+  
+    "checkpoint_file": "checkpoint.pth.tar",
+  
+    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear", "zoom", "brightness", "contrast"],
+    "augmentation_ranges": [
+      [-30, 30],
+      [-0.1, 0.1],
+      [-0.1, 0.1],
+      [-0.1, 0.1],
+      [0.9, 1.1],
+      [-32, 32],
+      [0.8, 1.2]
+    ],
+    "population_size": 10,
+    "crossover_rate": 0.9,
+    "elitism_selection_rate": 0.5,
+    "shuffle": false
+  }
+  
