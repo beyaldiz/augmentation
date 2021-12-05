@@ -3,25 +3,52 @@ import random
 from torchvision import transforms
 import torchvision.transforms.functional as F
 
-
+"""
+    Rotate by given angle
+"""
 def _rotate(angle):
     return lambda x: F.affine(
         x, angle=angle, translate=(0, 0), scale=1, shear=0)
 
-
-def _translate_horizontal(percent):
+"""
+    Translate horizontally by given factor
+"""
+def _translate_horizontal(factor):
     return lambda x: F.affine(
-        x, angle=0, translate=(percent, 0), scale=1, shear=0)
+        x, angle=0, translate=(factor, 0), scale=1, shear=0)
 
-
-def _translate_vertical(percent):
+"""
+    Translate vertically by given factor
+"""
+def _translate_vertical(factor):
     return lambda x: F.affine(
-        x, angle=0, translate=(0, percent), scale=1, shear=0)
+        x, angle=0, translate=(0, factor), scale=1, shear=0)
 
-
-def _shear(percent):
+"""
+    Shear by given factor
+"""
+def _shear(factor):
     return lambda x: F.affine(
-        x, angle=0, translate=(0, 0), scale=1, shear=percent)
+        x, angle=0, translate=(0, 0), scale=1, shear=factor)
+
+"""
+    Zoom by given factor
+"""
+def _zoom(factor):
+    return lambda x: F.affine(
+        x, angle=0, translate=(0, 0), scale=factor, shear=0)
+
+"""
+    Increase the pixel values by delta
+"""
+def _brightness(delta):
+    return lambda x: x + delta
+
+"""
+    Provide contrast by multiplying the pixel values by a factor
+"""
+def _contrast(factor):
+    return lambda x: x * factor
 
 
 def _custom(arg):
@@ -33,6 +60,9 @@ _transformations = {
     "translate_horizontal": _translate_horizontal,
     "translate_vertical": _translate_vertical,
     "shear": _shear,
+    "brightness": _brightness,
+    "contrast": _contrast,
+    "zoom": _zoom,
     "custom": _custom
 }
 
