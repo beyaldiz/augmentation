@@ -5,7 +5,7 @@ Genetic algorithm model base class.
 """
 
 
-class GABaseModel:
+class GA_BaseModel:
     def __init__(self, config):
         self.population_size = config.population_size
         self.augmentations = config.augmentations

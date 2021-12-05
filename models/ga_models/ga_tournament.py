@@ -2,13 +2,13 @@ from random import uniform, choice, choices, randint, random
 from functools import reduce
 
 from numpy.lib.function_base import select
-from models.ga_models.ga_base import GABaseModel
+from models.ga_models.ga_base import GA_BaseModel
 """
 Genetic algorithm with Tournament Selection.
 """
 
 
-class GA_Tournament(GABaseModel):
+class GA_Tournament(GA_BaseModel):
     def tournament_select(self, population, fitness):
         # Select ONE chromosome using Tournament method
         indices = [i for i in range(self.population_size)]

@@ -2,13 +2,13 @@ from random import uniform, choice, randint, random
 from functools import reduce
 
 from numpy.lib.function_base import select
-from models.ga_models.ga_base import GABaseModel
+from models.ga_models.ga_base import GA_BaseModel
 """
 Genetic algorithm with Roulette-Wheel Selection.
 """
 
 
-class GA_RWModel(GABaseModel):
+class GA_RWModel(GA_BaseModel):
     def roulette_wheel_select(self, population, fitness):
         # Select ONE chromosome using Roulette-Wheel method
         f_sum = sum(fitness)
