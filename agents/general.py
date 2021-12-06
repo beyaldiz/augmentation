@@ -142,10 +142,23 @@ class General(BaseAgent):
                                        correct / len(self.test_loader.dataset),
                                        self.current_epoch)
 
+        # visualize transformed images
         for transformed_images, _ in self.data_loader:
             break
         num_images = min(32, len(transformed_images))
         self.summary_writer.add_images("transformed images", transformed_images[:num_images], self.current_epoch)
+
+        # robust accuracy
+        if self.current_epoch % self.config.robust_interval == 0:
+            robust_acc = self.robust_accuracy()
+            self.summary_writer.add_scalar("robust accuracy",
+                                           robust_acc,
+                                           self.current_epoch)
+            print(f"robust accuracy: {robust_acc}")
+        
+            if self.current_epoch == self.config.max_epoch - 1:
+                print(f"final robust accuracy: {robust_acc}")
+                self.summary_writer.add_scalar("final robust accuracy", robust_acc)
 
     def run(self):
         """
@@ -256,12 +269,7 @@ class General(BaseAgent):
 
         return test_loss, correct
 
-    def finalize(self, num=3):
-        """
-        Finalizes all the operations of the 2 Main classes of the process, the operator and the data loader
-        :return:
-        """
-
+    def robust_accuracy(self, num=3):
         # compute robust accuracy
         genomes = []
         transform_list = []
@@ -301,6 +309,15 @@ class General(BaseAgent):
                         break
                 if is_robust:
                     correct += 1
+        return correct / instances
 
-        print(f"Robust accuracy: {correct / instances}")
-        self.summary_writer.add_scalar("robust accuracy", correct / instances)
+    def finalize(self, num=3):
+        """
+        Finalizes all the operations of the 2 Main classes of the process, the operator and the data loader
+        :return:
+        """
+        
+        if self.config.max_epoch % self.config.robust_interval != 0:
+            robust_acc = self.robust_accuracy()
+            print(f"Robust accuracy: {robust_acc}")
+            self.summary_writer.add_scalar("final robust accuracy", robust_acc)
