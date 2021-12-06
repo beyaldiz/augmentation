@@ -92,7 +92,7 @@ class General(BaseAgent):
             )
 
         self.cuda = self.is_cuda & self.config.cuda
-        self.model.cuda = self.cuda
+        self.model.enable_cuda = self.cuda
 
         # set the manual seed for torch
         self.manual_seed = self.config.seed

@@ -3,15 +3,15 @@ import torch.nn as nn
 
 
 class ResNet101(nn.Module):
-    def __init__(self, cuda=True):
+    def __init__(self, enable_cuda=True):
         super().__init__()
-        self.cuda = cuda
+        self.enable_cuda = enable_cuda
         self.model = torch.hub.load('pytorch/vision:v0.10.0',
                                     'resnet101',
                                     pretrained=False)
 
     def forward(self, x):
-        if self.cuda:
+        if self.enable_cuda:
             return self.model(x.cuda())
         else:
             return self.model(x)
