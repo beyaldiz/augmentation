@@ -142,6 +142,11 @@ class General(BaseAgent):
                                        correct / len(self.test_loader.dataset),
                                        self.current_epoch)
 
+        for transformed_images, _ in self.data_loader:
+            break
+        num_images = min(32, len(transformed_images))
+        self.summary_writer.add_images("transformed images", transformed_images[:num_images], self.current_epoch)
+
     def run(self):
         """
         The main operator
