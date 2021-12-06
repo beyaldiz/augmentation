@@ -92,6 +92,7 @@ class General(BaseAgent):
             )
 
         self.cuda = self.is_cuda & self.config.cuda
+        self.model.cuda = self.cuda
 
         # set the manual seed for torch
         self.manual_seed = self.config.seed
@@ -140,6 +141,11 @@ class General(BaseAgent):
         self.summary_writer.add_scalar("test accuracy",
                                        correct / len(self.test_loader.dataset),
                                        self.current_epoch)
+
+        for transformed_images, _ in self.data_loader:
+            break
+        num_images = min(32, len(transformed_images))
+        self.summary_writer.add_images("transformed images", transformed_images[:num_images], self.current_epoch)
 
     def run(self):
         """
@@ -193,7 +199,10 @@ class General(BaseAgent):
             for i in range(len(x)):
                 inpt = x[i]
                 y_pred = self.model(inpt)
-                loss = self.loss_single(y_pred, y[i].cuda())
+                if self.cuda:
+                    loss = self.loss_single(y_pred, y[i].cuda())
+                else:
+                    loss = self.loss_single(y_pred, y[i])
                 batch_loss.append(loss.cpu().detach().numpy())
             f_array.append(np.stack(batch_loss))
         f = np.concatenate(f_array, axis=1).transpose()
@@ -213,7 +222,10 @@ class General(BaseAgent):
 
         for x, y in tqdm(self.data_loader):
             y_pred = self.model(x)
-            cur_loss = self.loss(y_pred, y.cuda())
+            if self.cuda:
+                cur_loss = self.loss(y_pred, y.cuda())
+            else:
+                cur_loss = self.loss(y_pred, y)
             self.optimizer.zero_grad()
             cur_loss.backward()
             self.optimizer.step()
@@ -234,7 +246,10 @@ class General(BaseAgent):
 
         for x, y in tqdm(self.test_loader):
             y_pred = self.model(x)
-            cur_loss = self.loss(y_pred, y.cuda())
+            if self.cuda:
+                cur_loss = self.loss(y_pred, y.cuda())
+            else:
+                cur_loss = self.loss(y_pred, y)
             pred = y_pred.max(1)[1]
             correct += pred.cpu().eq(y).sum().item()
             test_loss += cur_loss.item()
@@ -281,7 +296,7 @@ class General(BaseAgent):
                     x_tr = x_tr[None, :]
                     y_pred = self.model(x_tr)
                     pred = y_pred.argmax()
-                    if pred != y[i].cuda():
+                    if (self.cuda and pred != y[i].cuda()) or (not self.cuda and pred != y[i]):
                         is_robust = False
                         break
                 if is_robust:
