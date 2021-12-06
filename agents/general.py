@@ -230,6 +230,7 @@ class General(BaseAgent):
         :return:
         """
         print("Model training...")
+        # return 0
         self.model.train()
         self.aug_dataset_train.train_best()
         epoch_loss = 0
@@ -278,6 +279,10 @@ class General(BaseAgent):
         genomes = product(*genomes)
         genomes = [list(genome) for genome in genomes]
 
+        # Pick 5 random genomes
+        shuffle(genomes)
+        genomes = genomes[:5]
+
         print("\nComputing robust accuracy...")
         self.model.eval()
         self.aug_dataset_test.eval_children()
@@ -287,17 +292,16 @@ class General(BaseAgent):
         self.aug_dataset_test.update_children(children) 
         robusts, total = 0, 0
         for x, y in tqdm(self.test_loader):
-            is_robust = 1
+            bs = len(x[0])
+            res = torch.BoolTensor([True for _ in range(bs)])
             for i in range(len(x)):
                 inpt = x[i]
                 y_pred = self.model(inpt)
                 pred = y_pred.max(1)[1]
-                eq_val = pred.cpu().eq(y[i]).sum().item()
-                if eq_val != pred.shape[0]:
-                    is_robust = 0
-                    break 
-            robusts += is_robust
-            total += 1
+                res = torch.logical_and(res, pred.cpu().eq(y[i]))
+            res[res == True] = 1
+            robusts += torch.sum(res)
+            total += bs
         return robusts / total
 
     def finalize(self, num=3):
