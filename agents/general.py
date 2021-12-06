@@ -280,8 +280,8 @@ class General(BaseAgent):
         genomes = [list(genome) for genome in genomes]
 
         # Pick 5 random genomes
-        shuffle(genomes)
-        genomes = genomes[:5]
+        # shuffle(genomes)
+        # genomes = genomes[:5]
 
         print("\nComputing robust accuracy...")
         self.model.eval()
