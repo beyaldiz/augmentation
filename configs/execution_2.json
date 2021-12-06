@@ -21,15 +21,15 @@
   
     "checkpoint_file": "checkpoint.pth.tar",
   
-    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear", "zoom", "brightness", "contrast"],
+    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear", "zoom", "contrast", "brightness"],
     "augmentation_ranges": [
       [-30, 30],
       [-0.1, 0.1],
       [-0.1, 0.1],
       [-0.1, 0.1],
       [0.9, 1.1],
-      [-32, 32],
-      [0.8, 1.2]
+      [0.8, 1.2],
+      [-32, 32]
     ],
     "population_size": 10,
     "crossover_rate": 0.9,

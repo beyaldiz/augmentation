@@ -1,9 +1,9 @@
 {
-    "exp_name": "Execution 4",
+    "exp_name": "Execution 5",
     "agent": "General",
     "dataset": "CIFAR10",
     "dl_model": "ResNet101",
-    "ga_model": "GA_RWModel",
+    "ga_model": "GA_Tournament",
     "mode": "train",
   
     "cuda": true,
