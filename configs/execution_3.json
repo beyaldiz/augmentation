@@ -18,6 +18,7 @@
     "beta2": 0.999,
   
     "max_epoch": 200,
+    "robust_interval": 10,
   
     "checkpoint_file": "checkpoint.pth.tar",
   
