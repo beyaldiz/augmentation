@@ -1,9 +1,9 @@
 {
-    "exp_name": "Execution 4",
+    "exp_name": "Execution 10",
     "agent": "General",
     "dataset": "CIFAR10",
     "dl_model": "ResNet101",
-    "ga_model": "GA_RWModel",
+    "ga_model": "GA_Tournament",
     "mode": "train",
   
     "cuda": true,
@@ -21,15 +21,12 @@
   
     "checkpoint_file": "checkpoint.pth.tar",
   
-    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear", "zoom", "contrast", "brightness"],
+    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear"],
     "augmentation_ranges": [
       [-30, 30],
       [-0.1, 0.1],
       [-0.1, 0.1],
-      [-0.1, 0.1],
-      [0.9, 1.1],
-      [0.8, 1.2],
-      [-32, 32]
+      [-0.1, 0.1]
     ],
     "population_size": 10,
     "crossover_rate": 0.9,
