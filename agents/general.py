@@ -60,6 +60,7 @@ class General(BaseAgent):
 
         self.aug_dataset_test = AugmentableDataset(test_data.data,
                                                    test_data.targets,
+                                                   self.transformations,
                                                    pre_transform=pre_transform)
 
         # not yet support GPU
@@ -254,6 +255,7 @@ class General(BaseAgent):
         """
         print("Model validation...")
         self.model.eval()
+        self.aug_dataset_test.train_best()
         test_loss = 0
         correct = 0
 
@@ -271,45 +273,32 @@ class General(BaseAgent):
 
     def robust_accuracy(self, num=3):
         # compute robust accuracy
-        genomes = []
-        transform_list = []
 
-        for i in range(len(self.config.augmentations)):
-            genomes.append(
-                list(
-                    linspace(self.config.augmentation_ranges[i][0],
-                             self.config.augmentation_ranges[i][1],
-                             num=num)))
-
-        for genome in product(*genomes):
-            transform = self.transformations.get_transformation(genome)
-
-            if self.config.shuffle:
-                shuffle(transform)
-
-            transform_list.append(transform)
+        genomes = [list(linspace(*aug_ranges, num=num)) for aug_ranges in self.config.augmentation_ranges]
+        genomes = product(*genomes)
+        genomes = [list(genome) for genome in genomes]
 
         print("\nComputing robust accuracy...")
         self.model.eval()
-        correct = 0
-        instances = 0
-
+        self.aug_dataset_test.eval_children()
+        children = [
+            genomes for _ in range(len(self.test_loader.dataset))
+        ]
+        self.aug_dataset_test.update_children(children) 
+        robusts, total = 0, 0
         for x, y in tqdm(self.test_loader):
+            is_robust = 1
             for i in range(len(x)):
-                is_robust = True
-                instances += 1
                 inpt = x[i]
-                for tr in transform_list:
-                    x_tr = tr(inpt)
-                    x_tr = x_tr[None, :]
-                    y_pred = self.model(x_tr)
-                    pred = y_pred.argmax()
-                    if (self.cuda and pred != y[i].cuda()) or (not self.cuda and pred != y[i]):
-                        is_robust = False
-                        break
-                if is_robust:
-                    correct += 1
-        return correct / instances
+                y_pred = self.model(inpt)
+                pred = y_pred.max(1)[1]
+                eq_val = pred.cpu().eq(y[i]).sum().item()
+                if eq_val != pred.shape[0]:
+                    is_robust = 0
+                    break 
+            robusts += is_robust
+            total += 1
+        return robusts / total
 
     def finalize(self, num=3):
         """
