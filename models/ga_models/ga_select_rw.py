@@ -12,7 +12,7 @@ class GA_RWModel(GA_BaseModel):
     def roulette_wheel_select(self, population, fitness):
         # Select ONE chromosome using Roulette-Wheel method
         f_sum = sum(fitness)
-        pick = uniform(0, f_sum)
+        pick = random() * f_sum
         tmp = 0
         for i in range(self.population_size):
             tmp += fitness[i]
