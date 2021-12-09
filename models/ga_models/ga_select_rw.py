@@ -18,6 +18,7 @@ class GA_RWModel(GA_BaseModel):
             tmp += fitness[i]
             if tmp > pick:
                 return population[i]
+        return population[self.population_size - 1]
 
     def update_single_population(self, population, fitness):
         # Redefine selection with Roulette-Wheel method
