@@ -33,8 +33,8 @@
       [-32, 32]
     ],
     "population_size": 1,
-    "crossover_rate": 0.9,
-    "elitism_selection_rate": 0.5,
+    "crossover_rate": 0.4,
+    "elitism_selection_rate": 0.4,
     "shuffle": false
   }
   
