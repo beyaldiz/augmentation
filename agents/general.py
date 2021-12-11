@@ -303,7 +303,7 @@ class General(BaseAgent):
         Finalizes all the operations of the 2 Main classes of the process, the operator and the data loader
         :return:
         """
-        
+        pass
         # if self.config.max_epoch % self.config.robust_interval != 0:
         #     robust_acc = self.robust_accuracy()
         #     print(f"Robust accuracy: {robust_acc}")
