@@ -82,7 +82,6 @@ class General(BaseAgent):
 
         # initialize counter
         self.current_epoch = 0
-        self.current_iteration = 0
         self.best_metric = 0
 
         # set cuda flag
@@ -128,20 +127,20 @@ class General(BaseAgent):
         """
         pass
 
-    def write_summary_per_epoch(self, epoch_loss, test_loss, correct):
-        print(f"\ntraining loss: {epoch_loss / len(self.data_loader)}")
-        print(f"test loss: {test_loss / len(self.test_loader)}")
-        print(f"test accuracy: {correct / len(self.test_loader.dataset)}")
+    def write_summary_per_epoch(self, epoch_loss, test_loss, epoch_correct, test_correct):
+        
+        # log accuracy and loss values
+        summaries = {
+            "training loss": epoch_loss / len(self.data_loader),
+            "test loss": test_loss / len(self.test_loader),
+            "training accuracy": epoch_correct / len(self.data_loader.dataset),
+            "test accuracy": test_correct / len(self.test_loader.dataset),
+        }
 
-        self.summary_writer.add_scalar("training loss",
-                                       epoch_loss / len(self.data_loader),
-                                       self.current_epoch)
-        self.summary_writer.add_scalar("test loss",
-                                       test_loss / len(self.test_loader),
-                                       self.current_epoch)
-        self.summary_writer.add_scalar("test accuracy",
-                                       correct / len(self.test_loader.dataset),
-                                       self.current_epoch)
+        print("")
+        for key, value in summaries.items():
+            print(f"{key}: {value}")
+            self.summary_writer.add_scalar(key, value, self.current_epoch)
 
         # visualize transformed images
         for transformed_images, _ in self.data_loader:
@@ -150,16 +149,16 @@ class General(BaseAgent):
         self.summary_writer.add_images("transformed images", transformed_images[:num_images], self.current_epoch)
 
         # robust accuracy
-        if self.current_epoch % self.config.robust_interval == 0:
+        if (self.current_epoch + 1) % self.config.robust_interval == 0:
             robust_acc = self.robust_accuracy()
             self.summary_writer.add_scalar("robust accuracy",
                                            robust_acc,
                                            self.current_epoch)
             print(f"robust accuracy: {robust_acc}")
         
-            if self.current_epoch == self.config.max_epoch - 1:
-                print(f"final robust accuracy: {robust_acc}")
-                self.summary_writer.add_scalar("final robust accuracy", robust_acc)
+            # if self.current_epoch + 1 == self.config.max_epoch:
+            #     print(f"final robust accuracy: {robust_acc}")
+            #     self.summary_writer.add_scalar("final robust accuracy", robust_acc)
 
     def run(self):
         """
@@ -181,20 +180,20 @@ class General(BaseAgent):
             self.current_epoch = epoch
             print(f"\nEpoch: {self.current_epoch + 1}")
             if epoch == 0:
-                epoch_loss = self.train_one_epoch()
-                test_loss, correct = self.validate()
+                epoch_loss, epoch_correct = self.train_one_epoch()
+                test_loss, test_correct = self.validate()
                 if type(self.ga_model).__name__ != 'GA_NoneModel':
                     self.ga_model.init_populations(
                         len(self.data_loader.dataset))
-                self.write_summary_per_epoch(epoch_loss, test_loss, correct)
+                self.write_summary_per_epoch(epoch_loss, test_loss, epoch_correct, test_correct)
                 self.current_epoch = epoch
                 continue
 
             if type(self.ga_model).__name__ != 'GA_NoneModel':
                 self.genetic_evolve_one_epoch()
-            epoch_loss = self.train_one_epoch()
-            test_loss, correct = self.validate()
-            self.write_summary_per_epoch(epoch_loss, test_loss, correct)
+            epoch_loss, epoch_correct = self.train_one_epoch()
+            test_loss, test_correct = self.validate()
+            self.write_summary_per_epoch(epoch_loss, test_loss, epoch_correct, test_correct)
 
     def genetic_evolve_one_epoch(self):
         """
@@ -230,10 +229,9 @@ class General(BaseAgent):
         :return:
         """
         print("Model training...")
-        # return 0
         self.model.train()
         self.aug_dataset_train.train_best()
-        epoch_loss = 0
+        epoch_loss, epoch_correct = 0, 0
 
         for x, y in tqdm(self.data_loader):
             y_pred = self.model(x)
@@ -244,10 +242,11 @@ class General(BaseAgent):
             self.optimizer.zero_grad()
             cur_loss.backward()
             self.optimizer.step()
+            pred = y_pred.max(1)[1]
+            epoch_correct += pred.cpu().eq(y).sum().item()
             epoch_loss += cur_loss.item()
-            self.current_iteration += 1
 
-        return epoch_loss
+        return epoch_loss, epoch_correct
 
     def validate(self):
         """
@@ -257,8 +256,7 @@ class General(BaseAgent):
         print("Model validation...")
         self.model.eval()
         self.aug_dataset_test.train_best()
-        test_loss = 0
-        correct = 0
+        test_loss, test_correct = 0, 0
 
         for x, y in tqdm(self.test_loader):
             y_pred = self.model(x)
@@ -267,10 +265,10 @@ class General(BaseAgent):
             else:
                 cur_loss = self.loss(y_pred, y)
             pred = y_pred.max(1)[1]
-            correct += pred.cpu().eq(y).sum().item()
+            test_correct += pred.cpu().eq(y).sum().item()
             test_loss += cur_loss.item()
 
-        return test_loss, correct
+        return test_loss, test_correct
 
     def robust_accuracy(self, num=3):
         # compute robust accuracy
@@ -278,10 +276,6 @@ class General(BaseAgent):
         genomes = [list(linspace(*aug_ranges, num=num)) for aug_ranges in self.config.augmentation_ranges]
         genomes = product(*genomes)
         genomes = [list(genome) for genome in genomes]
-
-        # Pick 5 random genomes
-        # shuffle(genomes)
-        # genomes = genomes[:5]
 
         print("\nComputing robust accuracy...")
         self.model.eval()
@@ -310,7 +304,7 @@ class General(BaseAgent):
         :return:
         """
         
-        if self.config.max_epoch % self.config.robust_interval != 0:
-            robust_acc = self.robust_accuracy()
-            print(f"Robust accuracy: {robust_acc}")
-            self.summary_writer.add_scalar("final robust accuracy", robust_acc)
+        # if self.config.max_epoch % self.config.robust_interval != 0:
+        #     robust_acc = self.robust_accuracy()
+        #     print(f"Robust accuracy: {robust_acc}")
+        #     self.summary_writer.add_scalar("final robust accuracy", robust_acc)
