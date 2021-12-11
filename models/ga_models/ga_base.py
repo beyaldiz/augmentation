@@ -15,6 +15,12 @@ class GA_BaseModel:
         self.elitism_selection_rate = config.elitism_selection_rate
         self.populations = []
 
+    def init_ineffective_genome(self):
+        return [
+            sum(self.augmentation_ranges[i]) / 2
+            for i in range(self.genome_len)
+        ]
+
     def init_single_genome(self):  # Initialize a single genome randomly
         return [
             uniform(*self.augmentation_ranges[i])
@@ -22,8 +28,11 @@ class GA_BaseModel:
         ]
 
     def init_single_population(
-            self):  # Initialize a single population randomly
-        return [self.init_single_genome() for _ in range(self.population_size)]
+            self, keep_one_ineffective=False):  # Initialize a single population randomly (it may keep one ineffective genome depending on hyperparam)
+        new_len = self.population_size - (1 if keep_one_ineffective else 0)
+        if keep_one_ineffective:
+            return [self.init_single_genome() for _ in range(new_len)] + [self.init_ineffective_genome()]
+        return [self.init_single_genome() for _ in range(new_len)]
 
     def init_populations(self, dataset_len):  # Initialize populations randomly
         self.dataset_len = dataset_len
