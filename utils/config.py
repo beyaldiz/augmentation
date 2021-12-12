@@ -24,6 +24,9 @@ def get_config_from_json(json_file):
             if 'current_epoch' not in config or not config['current_epoch']:
                 config.current_epoch = 0
 
+            if 'num_log_samples' not in config or not config['num_log_samples']:
+                config.num_log_samples = 32
+
             return config, config_dict
         except ValueError:
             print("INVALID JSON file format.. Please provide a good json file")

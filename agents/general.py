@@ -3,7 +3,7 @@ import numpy as np
 from tqdm import tqdm
 from itertools import product
 from numpy import linspace
-from random import shuffle
+import json
 
 import torch
 from torch import nn
@@ -143,10 +143,20 @@ class General(BaseAgent):
             self.summary_writer.add_scalar(key, value, self.current_epoch)
 
         # visualize transformed images
-        for transformed_images, _ in self.data_loader:
+        for transformed_images, _ in self.data_loader_ordered:
             break
-        num_images = min(32, len(transformed_images))
+        num_images = min(self.config.num_log_samples, len(transformed_images))
         self.summary_writer.add_images("transformed images", transformed_images[:num_images], self.current_epoch)
+
+        # log GA of transformations
+        # def pretty_json(hp):
+        #     json_hp = json.dumps(hp, indent=2)
+        #     return "".join("\t" + line for line in json_hp.splitlines(True)) 
+
+        # text = dict()
+        # for i, c in enumerate(self.ga_model.populations[:self.config.num_log_samples]):
+        #     text[i] = dict(zip(self.config.augmentations, c[0]))
+        # self.summary_writer.add_text("transformations", pretty_json(text), self.current_epoch)
 
         # robust accuracy
         if (self.current_epoch + 1) % self.config.robust_interval == 0:

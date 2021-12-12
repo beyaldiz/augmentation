@@ -3,6 +3,7 @@
 experiments/
 runs/
 data/
+viz/
 *-py/
 
 # Byte-compiled / optimized / DLL files
