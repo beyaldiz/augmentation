@@ -1,8 +1,8 @@
 {
-    "exp_name": "Set_2 - Exec_7 - Random - T3 - U - RN_50",
+    "exp_name": "Set_4 - Exec_19 - Random - T6 - U - RN_?",
     "agent": "General",
     "dataset": "CIFAR10",
-    "dl_model": "ResNet50",
+    "dl_model": "UNDECIDED",
     "ga_model": "GA_RandomModel",
     "mode": "train",
   
@@ -10,27 +10,30 @@
     "gpu_device": 0,
     "seed": 1337,
   
-    "batch_size": 512,
+    "batch_size": 128,
   
-    "learning_rate": 0.0002,
+    "learning_rate": 0.0001,
     "weight_decay": 0.001,
     "beta1": 0.5,
     "beta2": 0.999,
   
     "max_epoch": 200,
-    "robust_interval": 25,
+    "robust_interval": 10,
   
     "checkpoint_file": "checkpoint.pth.tar",
   
-    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear"],
+    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear", "zoom", "contrast", "brightness"],
     "augmentation_ranges": [
       [-30, 30],
       [-0.1, 0.1],
       [-0.1, 0.1],
-      [-0.1, 0.1]
+      [-0.1, 0.1],
+      [0.9, 1.1],
+      [0.8, 1.2],
+      [-32, 32]
     ],
     "augmentation_discrete_nums": [
-      0, 0, 0, 0
+      0, 0, 0, 0, 0, 0, 0
     ],
     "population_size": 1,
     "crossover_rate": 0.4,

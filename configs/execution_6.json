@@ -1,9 +1,9 @@
 {
-    "exp_name": "Execution 6",
+    "exp_name": "Set_1 - Exec_6 - Standard - T0 - U - RN_101",
     "agent": "General",
     "dataset": "CIFAR10",
     "dl_model": "ResNet101",
-    "ga_model": "GA_RandomModel",
+    "ga_model": "GA_NoneModel",
     "mode": "train",
   
     "cuda": true,
@@ -32,9 +32,9 @@
     "augmentation_discrete_nums": [
       0, 0, 0, 0
     ],
-    "population_size": 1,
-    "crossover_rate": 0.4,
-    "elitism_selection_rate": 0.4,
+    "population_size": 10,
+    "crossover_rate": 0.9,
+    "elitism_selection_rate": 0.5,
     "shuffle": false
   }
   

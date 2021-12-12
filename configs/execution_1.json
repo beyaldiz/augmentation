@@ -1,5 +1,5 @@
 {
-    "exp_name": "Execution 1",
+    "exp_name": "Set_1 - Exec_1 - Random - T3 - U - RN_101",
     "agent": "General",
     "dataset": "CIFAR10",
     "dl_model": "ResNet101",
@@ -22,22 +22,19 @@
   
     "checkpoint_file": "checkpoint.pth.tar",
   
-    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear", "zoom", "contrast", "brightness"],
+    "augmentations": ["rotate", "translate_horizontal", "translate_vertical", "shear"],
     "augmentation_ranges": [
       [-30, 30],
       [-0.1, 0.1],
       [-0.1, 0.1],
-      [-0.1, 0.1],
-      [0.9, 1.1],
-      [0.8, 1.2],
-      [-32, 32]
+      [-0.1, 0.1]
     ],
     "augmentation_discrete_nums": [
       0, 0, 0, 0
     ],
     "population_size": 1,
-    "crossover_rate": 0.4,
-    "elitism_selection_rate": 0.4,
+    "crossover_rate": 0.9,
+    "elitism_selection_rate": 0.5,
     "shuffle": false
   }
   
