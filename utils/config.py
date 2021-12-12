@@ -26,6 +26,9 @@ def get_config_from_json(json_file):
 
             if 'num_log_samples' not in config or not config['num_log_samples']:
                 config.num_log_samples = 32
+            
+            if 'optimizer' not in config or not config['optimizer']:
+                config.optimizer = 'SGD'
 
             return config, config_dict
         except ValueError:

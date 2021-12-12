@@ -10,8 +10,7 @@ from torch import nn
 
 from torchvision.datasets import *
 from torch.utils.data import DataLoader
-from torch.optim import SGD
-from torch.optim import Adam
+from torch.optim import *
 from torchvision import transforms
 import torch.nn.functional as F
 
@@ -78,7 +77,13 @@ class General(BaseAgent):
         self.loss_single = nn.CrossEntropyLoss(reduction='none')
 
         # define optimizers for both generator and discriminator
-        self.optimizer = Adam(self.model.parameters(), lr=config.learning_rate)
+        try:
+            optimizer = globals()[config.optimizer]
+        except:
+            raise KeyError(
+                "The optimizer name is invalid, please visit https://pytorch.org/docs/stable/optim.html"
+            )
+        self.optimizer = optimizer(self.model.parameters(), lr=config.learning_rate)
 
         # initialize counter
         self.current_epoch = 0
