@@ -30,6 +30,7 @@ class AugmentableDataset(Dataset):
         self.post_transform = post_transform
         self.shuffle = shuffle
         self.transforms = [None for _ in range(self.images.shape[0])]
+        self.best_genomes = [None for _ in range(self.images.shape[0])]
         self._eval_children = False
         self._children = None
 
@@ -98,6 +99,7 @@ class AugmentableDataset(Dataset):
         f_best (numpy.array, shape: (N, )): indices of the children that have the largest loss 
         """
         for i in range(f_best.shape[0]):
+            self.best_genomes[i] = self._children[i][f_best[i]]
             self.transforms[i] = self.transformations.get_transformation(
                 self._children[i][f_best[i]])
 

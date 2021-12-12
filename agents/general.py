@@ -149,14 +149,14 @@ class General(BaseAgent):
         self.summary_writer.add_images("transformed images", transformed_images[:num_images], self.current_epoch)
 
         # log GA of transformations
-        # def pretty_json(hp):
-        #     json_hp = json.dumps(hp, indent=2)
-        #     return "".join("\t" + line for line in json_hp.splitlines(True)) 
+        def pretty_json(hp):
+            json_hp = json.dumps(hp, indent=2)
+            return "".join("\t" + line for line in json_hp.splitlines(True)) 
 
-        # text = dict()
-        # for i, c in enumerate(self.ga_model.populations[:self.config.num_log_samples]):
-        #     text[i] = dict(zip(self.config.augmentations, c[0]))
-        # self.summary_writer.add_text("transformations", pretty_json(text), self.current_epoch)
+        text = dict()
+        for i in range(self.config.num_log_samples):
+            text[i] = dict(zip(self.config.augmentations, self.aug_dataset_train.best_genomes[i]))
+        self.summary_writer.add_text("transformations", pretty_json(text), self.current_epoch)
 
         # robust accuracy
         if (self.current_epoch + 1) % self.config.robust_interval == 0:
