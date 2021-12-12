@@ -4,6 +4,7 @@
     "dataset": "CIFAR10",
     "dl_model": "UNDECIDED",
     "ga_model": "GA_Tournament",
+    "optimizer": "?",
     "mode": "train",
   
     "cuda": true,

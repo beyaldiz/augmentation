@@ -4,6 +4,7 @@
     "dataset": "CIFAR10",
     "dl_model": "ResNet101",
     "ga_model": "GA_NoneModel",
+    "optimizer": "?",
     "mode": "train",
   
     "cuda": true,

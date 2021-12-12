@@ -78,7 +78,7 @@ class General(BaseAgent):
 
         # Hard-coded for experiments
         if config.optimizer == "SGD":
-            self.optimizer = SGD(self.model.parameters(), lr=0.1, momentum=0.9, nesterov=True)
+            self.optimizer = SGD(self.model.parameters(), lr=config.learning_rate, momentum=0.9, nesterov=True)
         elif config.optimizer == "Adam":
             self.optimizer = Adam(self.model.parameters(), lr=config.learning_rate)
 

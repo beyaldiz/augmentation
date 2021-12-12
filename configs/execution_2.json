@@ -4,6 +4,7 @@
     "dataset": "CIFAR10",
     "dl_model": "ResNet101",
     "ga_model": "GA_RandomModel",
+    "optimizer": "Adam",
     "mode": "train",
   
     "cuda": true,
