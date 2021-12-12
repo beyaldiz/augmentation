@@ -1,5 +1,5 @@
 {
-    "exp_name": "Set_2 - Exec_10 - Sensei_T - T3 - U - RN_50",
+    "exp_name": "Set_2 - Exec_10 - Sensei_RW - T3 - U - RN_50",
     "agent": "General",
     "dataset": "CIFAR10",
     "dl_model": "ResNet50",
