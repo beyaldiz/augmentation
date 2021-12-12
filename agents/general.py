@@ -153,10 +153,11 @@ class General(BaseAgent):
             json_hp = json.dumps(hp, indent=2)
             return "".join("\t" + line for line in json_hp.splitlines(True)) 
 
-        text = dict()
-        for i in range(self.config.num_log_samples):
-            text[i] = dict(zip(self.config.augmentations, self.aug_dataset_train.best_genomes[i]))
-        self.summary_writer.add_text("transformations", pretty_json(text), self.current_epoch)
+        if self.current_epoch > 0:
+            text = dict()
+            for i in range(self.config.num_log_samples):
+                text[i] = dict(zip(self.config.augmentations, self.aug_dataset_train.best_genomes[i]))
+            self.summary_writer.add_text("transformations", pretty_json(text), self.current_epoch)
 
         # robust accuracy
         if (self.current_epoch + 1) % self.config.robust_interval == 0:
