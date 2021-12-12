@@ -29,6 +29,9 @@
       [-0.1, 0.1],
       [-0.1, 0.1]
     ],
+    "augmentation_discrete_nums": [
+      0, 0, 0, 0
+    ],
     "population_size": 1,
     "crossover_rate": 0.4,
     "elitism_selection_rate": 0.4,

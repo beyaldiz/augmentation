@@ -32,6 +32,9 @@
       [0.8, 1.2],
       [-32, 32]
     ],
+    "augmentation_discrete_nums": [
+      0, 0, 0, 0
+    ],
     "population_size": 10,
     "crossover_rate": 0.4,
     "elitism_selection_rate": 0.4,
