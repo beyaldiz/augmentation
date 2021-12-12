@@ -76,14 +76,21 @@ class General(BaseAgent):
         self.loss = nn.CrossEntropyLoss()
         self.loss_single = nn.CrossEntropyLoss(reduction='none')
 
+        # Hard-coded for experiments
+        if config.optimizer == "SGD":
+            self.optimizer = SGD(self.model.parameters(), lr=0.1, momentum=0.9, nesterov=True)
+        elif config.optimizer == "Adam":
+            self.optimizer = Adam(self.model.parameters(), lr=config.learning_rate)
+
         # define optimizers for both generator and discriminator
-        try:
-            optimizer = globals()[config.optimizer]
-        except:
-            raise KeyError(
-                "The optimizer name is invalid, please visit https://pytorch.org/docs/stable/optim.html"
-            )
-        self.optimizer = optimizer(self.model.parameters(), lr=config.learning_rate)
+        else:
+            try:
+                optimizer = globals()[config.optimizer]
+            except:
+                raise KeyError(
+                    "The optimizer name is invalid, please visit https://pytorch.org/docs/stable/optim.html"
+                )
+            self.optimizer = optimizer(self.model.parameters(), lr=config.learning_rate)
 
         # initialize counter
         self.current_epoch = 0
