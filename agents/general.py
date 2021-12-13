@@ -165,7 +165,7 @@ class General(BaseAgent):
             json_hp = json.dumps(hp, indent=2)
             return "".join("\t" + line for line in json_hp.splitlines(True)) 
 
-        if self.current_epoch > 0:
+        if type(self.ga_model).__name__ != 'GA_NoneModel' and self.current_epoch > 0:
             text = dict()
             for i in range(self.config.num_log_samples):
                 text[i] = dict(zip(self.config.augmentations, self.aug_dataset_train.best_genomes[i]))
