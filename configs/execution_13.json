@@ -31,7 +31,7 @@
       [-0.1, 0.1]
     ],
     "augmentation_discrete_nums": [
-      0, 0, 0, 0
+      61, 7, 7, 41
     ],
     "population_size": 1,
     "crossover_rate": 0.4,
