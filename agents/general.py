@@ -11,6 +11,7 @@ from torch import nn
 from torchvision.datasets import *
 from torch.utils.data import DataLoader
 from torch.optim import *
+from torch.optim.lr_scheduler import StepLR
 from torchvision import transforms
 import torch.nn.functional as F
 
@@ -89,7 +90,7 @@ class General(BaseAgent):
             self.optimizer = SGD(self.model.parameters(), lr=config.learning_rate, momentum=0.9, weight_decay=config.weight_decay, nesterov=True)
         elif config.optimizer == "Adam":
             self.optimizer = Adam(self.model.parameters(), lr=config.learning_rate)
-
+        
         # define optimizers for both generator and discriminator
         else:
             try:
@@ -99,6 +100,9 @@ class General(BaseAgent):
                     "The optimizer name is invalid, please visit https://pytorch.org/docs/stable/optim.html"
                 )
             self.optimizer = optimizer(self.model.parameters(), lr=config.learning_rate)
+        
+        # Hard coded for experiments
+        self.scheduler = StepLR(self.optimizer, step_size=80, gamma=0.1)
 
         # initialize counter
         self.current_epoch = 0
@@ -277,6 +281,7 @@ class General(BaseAgent):
             epoch_correct += pred.cpu().eq(y).sum().item()
             epoch_loss += cur_loss.item()
 
+        self.scheduler.step()
         return epoch_loss, epoch_correct
 
     def validate(self):
