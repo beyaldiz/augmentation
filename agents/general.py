@@ -242,17 +242,18 @@ class General(BaseAgent):
         self.aug_dataset_train.update_children(children)
 
         f_array = []
-        for x, y in tqdm(self.data_loader_ordered):
-            batch_loss = []
-            for i in range(len(x)):
-                inpt = x[i]
-                y_pred = self.model(inpt)
-                if self.cuda:
-                    loss = self.loss_single(y_pred, y[i].cuda())
-                else:
-                    loss = self.loss_single(y_pred, y[i])
-                batch_loss.append(loss.cpu().detach().numpy())
-            f_array.append(np.stack(batch_loss))
+        with torch.no_grad():
+            for x, y in tqdm(self.data_loader_ordered):
+                batch_loss = []
+                for i in range(len(x)):
+                    inpt = x[i]
+                    y_pred = self.model(inpt)
+                    if self.cuda:
+                        loss = self.loss_single(y_pred, y[i].cuda())
+                    else:
+                        loss = self.loss_single(y_pred, y[i])
+                    batch_loss.append(loss.cpu().detach().numpy())
+                f_array.append(np.stack(batch_loss))
         f = np.concatenate(f_array, axis=1).transpose()
         f_best = f.argmax(axis=1)
         self.aug_dataset_train.pick_best_child(f_best)
