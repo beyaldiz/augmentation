@@ -294,15 +294,16 @@ class General(BaseAgent):
         self.aug_dataset_test.train_best()
         test_loss, test_correct = 0, 0
 
-        for x, y in tqdm(self.test_loader):
-            y_pred = self.model(x)
-            if self.cuda:
-                cur_loss = self.loss(y_pred, y.cuda())
-            else:
-                cur_loss = self.loss(y_pred, y)
-            pred = y_pred.max(1)[1]
-            test_correct += pred.cpu().eq(y).sum().item()
-            test_loss += cur_loss.item()
+        with torch.no_grad():
+            for x, y in tqdm(self.test_loader):
+                y_pred = self.model(x)
+                if self.cuda:
+                    cur_loss = self.loss(y_pred, y.cuda())
+                else:
+                    cur_loss = self.loss(y_pred, y)
+                pred = y_pred.max(1)[1]
+                test_correct += pred.cpu().eq(y).sum().item()
+                test_loss += cur_loss.item()
 
         return test_loss, test_correct
 
@@ -321,17 +322,18 @@ class General(BaseAgent):
         ]
         self.aug_dataset_test.update_children(children) 
         robusts, total = 0, 0
-        for x, y in tqdm(self.test_loader):
-            bs = len(x[0])
-            res = torch.BoolTensor([True for _ in range(bs)])
-            for i in range(len(x)):
-                inpt = x[i]
-                y_pred = self.model(inpt)
-                pred = y_pred.max(1)[1]
-                res = torch.logical_and(res, pred.cpu().eq(y[i]))
-            res[res == True] = 1
-            robusts += torch.sum(res)
-            total += bs
+        with torch.no_grad():
+            for x, y in tqdm(self.test_loader):
+                bs = len(x[0])
+                res = torch.BoolTensor([True for _ in range(bs)])
+                for i in range(len(x)):
+                    inpt = x[i]
+                    y_pred = self.model(inpt)
+                    pred = y_pred.max(1)[1]
+                    res = torch.logical_and(res, pred.cpu().eq(y[i]))
+                res[res == True] = 1
+                robusts += torch.sum(res)
+                total += bs
         return robusts / total
 
     def finalize(self, num=3):
