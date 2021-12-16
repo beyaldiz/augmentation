@@ -36,8 +36,8 @@ class General(BaseAgent):
 
         # Pre-transformations
         pre_transform_train = transforms.Compose([
+            transforms.ToTensor(),            
             transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
         pre_transform_test = transforms.Compose([
