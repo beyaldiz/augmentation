@@ -32,8 +32,16 @@ class General(BaseAgent):
 
         # define data_loader
         self.batch_size = config.batch_size
-        pre_transform = transforms.Compose([
+
+        # Pre-transformations
+        pre_transform_train = transforms.Compose([
+            transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+        ])
+        pre_transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
         ])
 
         # Transformations defined in config is loaded into Transformations class
@@ -54,13 +62,13 @@ class General(BaseAgent):
             data.data,
             data.targets,
             self.transformations,
-            pre_transform=pre_transform,
+            pre_transform=pre_transform_train,
             shuffle=config.shuffle)
 
         self.aug_dataset_test = AugmentableDataset(test_data.data,
                                                    test_data.targets,
                                                    self.transformations,
-                                                   pre_transform=pre_transform)
+                                                   pre_transform=pre_transform_test)
 
         # not yet support GPU
         self.data_loader = DataLoader(self.aug_dataset_train,
