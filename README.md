@@ -47,7 +47,7 @@ Performance comparison using different data-augmenting strategies including two 
 ## Discussion
 
 Discussions of the results can be found in our final report. \
-https://github.com/beyaldiz/Robustness-of-Deep-Neural-Networks/blob/main/CS454_Final_Project.pdf
+https://github.com/beyaldiz/augmentation/blob/readme/CS454_Final_Project.pdf
 
 ## References
 
